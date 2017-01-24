@@ -74,21 +74,22 @@ class Myframe(Frame):
         timer_init = 1
 
     def initGame(self):
-	self.text1 = self.canvas.create_text(100, 120, font=("Purisa", 60, 'bold'), text=myDic.Kanji[self.kan0])
+	self.text1 = self.canvas.create_text(210, 70, font=("Purisa", 25, 'bold'), text=playlist[self.kan0])
+	score = lines[1]
 	self.buttons = {}
 	self.textL = {}
 	for opt in range(5):
-	  height=50+30*opt
-	  self.buttons[opt] = Button(self.canvas, text = mylist[opt], font=("Purisa"), command = lambda k=opt: self.check(k), width=15, bg="white", activebackground="#DFECF2")
-	  self.buttons[opt].place(x=210, y=height)
-	  self.textL[opt] = self.canvas.create_text(385, height+20, text=str(opt+1), font=("Purisa"))
+	  width=60+60*opt
+	  self.buttons[opt] = Button(self.canvas, text = mylist[opt], font=("Purisa", 20), command = lambda k=opt: self.check(k), width=2, bg="white", activebackground="#DFECF2")
+	  self.buttons[opt].place(x=width, y=165)
+	  self.textL[opt] = self.canvas.create_text(width+30, 240, text=str(opt+1), font=("Purisa", 15))
 	# autoplay image
 	self.img = Image.open(icon)
 	resized = self.img.resize((40, 40),Image.ANTIALIAS)
 	self.im = ImageTk.PhotoImage(resized)
 	# autoplay button
 	self.buttonS = Button(self.canvas, image=self.im, command=lambda k=ii: play(myDic.Sound[keys[k]]), relief=FLAT, bg='white', activebackground='white',highlightthickness=0,bd=0)
-	self.buttonS.place(x=80, y=165)
+	self.buttonS.place(x=210, y=113, anchor='c')
 	
 	# Hearts
 	self.heartL = {}
@@ -112,7 +113,7 @@ class Myframe(Frame):
 
     def check(self, num):
 	global hearts, Score, ii
-	if playlist[keys[ii]] == mylist[num]:
+	if myDic.Kanji[keys[ii]] == mylist[num]:
 	  hearts+=1
 	  if hearts < 5: Score+=1
 	  elif 5 <= hearts < 10: 
@@ -133,19 +134,19 @@ class Myframe(Frame):
 	  for i in range(3):
 		self.canvas.itemconfig(self.heartL[i], fill='#DFECF2')
 	  self.buttons[num].configure(bg="red", activebackground="red")
-	  jj=mylist.index(playlist[keys[ii]])
+	  jj=mylist.index(myDic.Kanji[keys[ii]])
 	  self.buttons[jj].configure(bg="green", activebackground="green")
 	  self.after(1000, self.next_)
 
     def next_(self):
 	global ii, mylist, keys
-        print ii, myDic.Kanji[keys[ii]], mylist
+        print ii, playlist[keys[ii]], mylist
 	if ii == len(keys)-1: 
 		ii=0
 		keys = myDic.shuffled()
 	else:
 		ii+=1
-        self.canvas.itemconfig(self.text1, text=myDic.Kanji[keys[ii]])
+        self.canvas.itemconfig(self.text1, text=playlist[keys[ii]])
 	mylist=newlist(ii)
 	for opt in range(5):
 	  self.buttons[opt].configure(text=mylist[opt], bg='white', activebackground="#DFECF2")
@@ -183,10 +184,10 @@ def main():
 
 def newlist(ii):
     mylist = []
-    mylist.append(playlist[keys[ii]])
-    shuffled=playlist.values()[:]
+    mylist.append(myDic.Kanji[keys[ii]])
+    shuffled=myDic.Kanji.values()[:]
     random.shuffle(shuffled)
-    shuffled.remove(playlist[keys[ii]])
+    shuffled.remove(myDic.Kanji[keys[ii]])
     for i in range(0,4):
 	mylist.append(shuffled[i])
     random.shuffle(mylist)
