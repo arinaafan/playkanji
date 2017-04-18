@@ -118,12 +118,6 @@ def main():
     root.geometry("600x500+300+300")
     root.mainloop()  
 
-def play(sound):
-
-    mixer.init()
-    mixer.music.load(path + sound)
-    mixer.music.play()
-
 if __name__ == '__main__':
     main() 
 

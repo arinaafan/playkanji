@@ -38,20 +38,27 @@ class Myframe(Frame):
         self.canvas.pack(fill=BOTH, expand=1)
 	playlist = newlist()
 	print 'Check: ', playlist.keys()[0], playlist.values()[0]
-	self.text1 = self.canvas.create_text(210, 100, font=("Purisa", 35, 'bold'), text=playlist.keys()[0])
-	self.text2 = self.canvas.create_text(210, 150, font=("Purisa", 20), text=playlist.values()[0])
+
+	# Frame
+	self.color = 'red'
+	self.canvas.create_rectangle(80,130,340,350, outline="grey")
+#	self.canvas.create_arc(80,70,140,190, start=90, extent=90, outline=self.color, fill=self.color)
+	self.canvas.create_rectangle(80,70,340,130, outline=self.color, fill=self.color)
+#	self.canvas.create_arc(280,70,340,190, start=0, extent=90, outline=self.color, fill=self.color)
+	self.text1 = self.canvas.create_text(210, 200, font=("Purisa", 35, 'bold'), text=playlist.keys()[0])
+	self.text2 = self.canvas.create_text(210, 250, font=("Purisa", 20), text=playlist.values()[0])
 	self.buttonTrue = Button(self.canvas, text = 'True', font=("Purisa", 16,'bold'), command = lambda k=1: self.check(k), width=5, bg="green", activebackground="#DFECF2")
-	self.buttonTrue.place(x=250, y=200, anchor="c")
+	self.buttonTrue.place(x=250, y=300, anchor="c")
 	self.buttonFalse = Button(self.canvas, text='False', font=("Purisa", 16,'bold'), command = lambda k=0: self.check(k), width=5, bg="red", activebackground="#DFECF2")
-	self.buttonFalse.place(x=170, y=200, anchor="c")
+	self.buttonFalse.place(x=170, y=300, anchor="c")
 	
 	# Hearts
 	self.heartL = {}
 	for it in range(3):
-	  self.heartL[it] = self.canvas.create_text(20+it*17,280, text=u"\u2665", font=('Purisa',16),fill='#DFECF2')
+	  self.heartL[it] = self.canvas.create_text(20+it*17,400, text=u"\u2665", font=('Purisa',16),fill='#DFECF2')
 
 	# Print score
-	self.printScore = self.canvas.create_text(70,280, text='Score: '+str(Score), font=('Purisa',14),fill='#778899',anchor=W)
+	self.printScore = self.canvas.create_text(70,400, text='Score: '+str(Score), font=('Purisa',14),fill='#778899',anchor=W)
 
 	# Timer
 	self.canvas.create_oval(10,10,50,50,fill='#DFECF2',outline='white')
@@ -91,6 +98,8 @@ class Myframe(Frame):
 		ii+=1
         self.canvas.itemconfig(self.text1, text=playlist.keys()[ii])
 	self.canvas.itemconfig(self.text2, text=playlist.values()[ii])	
+	self.buttonTrue["background"] = 'green'
+	self.buttonFalse["background"] = 'red'
 
     def run_timer(self):
 	global sec
@@ -104,10 +113,10 @@ def main():
     global root
     root = Tk()
     frame = Myframe(root)
-    root.geometry("420x300+300+300")
+    root.geometry("420x500+300+300")
     def defkey(event):
-       if event.keysym=='Right': jj=1; frame.check(jj)
-       if event.keysym=='Left': jj=0; frame.check(jj)
+       if event.keysym=='Right': jj=1; frame.check(jj); frame.buttonTrue["background"]="grey"
+       if event.keysym=='Left': jj=0; frame.check(jj); frame.buttonFalse["background"]="grey"
 
     root.bind("<Key>", defkey)
     root.mainloop()

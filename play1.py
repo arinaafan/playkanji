@@ -71,6 +71,11 @@ def main():
     ex = Myframe(root, myDic)
     root.geometry("380x330+300+300")
     play(myDic.Sound[myDic.kan[0]])
+    def defkey(event):
+       if event.keysym=='Right': ex.next_kanji
+       if event.keysym=='Left': ex.prev_kanji
+
+    root.bind("<Key>", defkey)
     root.mainloop()  
 
 def play(sound):

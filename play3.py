@@ -75,7 +75,6 @@ class Myframe(Frame):
 
     def initGame(self):
 	self.text1 = self.canvas.create_text(210, 70, font=("Purisa", 25, 'bold'), text=playlist[self.kan0])
-	score = lines[1]
 	self.buttons = {}
 	self.textL = {}
 	for opt in range(5):

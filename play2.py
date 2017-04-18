@@ -26,7 +26,7 @@ timer_init=0
 playlist={}
 date_=datetime.date.today()
 
-class Myframe(Frame):
+class Play2frame(Frame):
   
     def __init__(self, parent):
         Frame.__init__(self, parent)   
@@ -162,7 +162,7 @@ class Myframe(Frame):
 def main():
     global root
     root = Tk()
-    frame = Myframe(root)
+    frame = Play2frame(root)
     root.geometry("420x300+300+300")
     def defkey(event):
        if event.keysym in ['1','2','3','4','5']:
@@ -196,6 +196,7 @@ def play(sound):
     mixer.init()
     mixer.music.load(path + sound)
     mixer.music.play()
+    print sound
 
 def end_game(fr):
     global root, playoption, Date, TopScore, Mode, date_
