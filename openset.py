@@ -4,7 +4,7 @@ from PIL import ImageTk, Image
 
 
 path='/home/arina/kanji/'
-icon='/home/arina/kanji/icon_5_small.png'
+icon='/home/arina/kanji/icons/icon_5_small.png'
 
 class Myframe(Frame):
 

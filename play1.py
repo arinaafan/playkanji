@@ -1,17 +1,9 @@
 import csv, sys, math
 from Tkinter import *
 from pygame import mixer
-from dic import Dic
+from dic import Dic, openSet, Set, play
 
 path='/home/arina/kanji/'
-filename = path + str(sys.argv[1])
-
-## open file
-infile = open(filename, 'r')
-
-## define csv reader object, assuming delimiter is tab
-tsvfile = csv.reader(infile, delimiter='\t')
-
 i=0
 
 class Myframe(Frame):
@@ -65,25 +57,25 @@ class Myframe(Frame):
 	  ii+=1
 
 def main():
-  
     root = Tk()
+    chooseSet = openSet(root, Set)
+    root.geometry("600x700+300+300")
+    root.mainloop()
+    myfile = chooseSet.myfile.get()
+    print myfile
+    infile = open(myfile, 'r')
+    tsvfile = csv.reader(infile, delimiter='\t')
     myDic = Dic(tsvfile)
-    ex = Myframe(root, myDic)
+    root = Tk()
+    game = Myframe(root, myDic)
     root.geometry("380x330+300+300")
     play(myDic.Sound[myDic.kan[0]])
     def defkey(event):
-       if event.keysym=='Right': ex.next_kanji
-       if event.keysym=='Left': ex.prev_kanji
+       if event.keysym=='Right': game.next_kanji()
+       if event.keysym=='Left': game.prev_kanji()
 
     root.bind("<Key>", defkey)
     root.mainloop()  
-
-def play(sound):
-
-    mixer.init()
-    mixer.music.load(path + sound)
-    mixer.music.play()
-
 
 if __name__ == '__main__':
     main() 

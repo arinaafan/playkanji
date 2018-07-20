@@ -2,19 +2,12 @@ import csv, sys, math, random, time, datetime
 from Tkinter import *
 from pygame import mixer
 from PIL import ImageTk, Image
-from dic import Dic
-
+from dic import Dic, openSet, Set, play
+from play4 import start_over
 
 icon='/home/arina/tmp/play_sound3.gif'
 path='/home/arina/kanji/'
-filename = str(sys.argv[1])
-scorefile = str(sys.argv[2])
-
-## open file
-infile = open(filename, 'r')
-
-## define csv reader object, assuming delimiter is tab
-tsvfile = csv.reader(infile, delimiter='\t')
+scorefile = path + 'play2.topscore'
 scorelines = csv.reader(open(scorefile, 'r'), delimiter='\t')
 
 ii=0
@@ -25,10 +18,13 @@ playoption=''
 timer_init=0
 playlist={}
 date_=datetime.date.today()
+myDic = {}
+keys = []
+
 
 class Play2frame(Frame):
   
-    def __init__(self, parent):
+    def __init__(self, parent, myDic, keys):
         Frame.__init__(self, parent)   
         
         self.parent = parent        
@@ -38,6 +34,13 @@ class Play2frame(Frame):
         self.canvas = Canvas(self, background='white')
         self.canvas.pack(fill=BOTH, expand=1)
 	self.chooseOpt()
+
+        self.BGimg = Image.open(path + 'icons/back.jpeg')
+        self.BGimg = self.BGimg.resize((420, 500),Image.ANTIALIAS)
+        self.BGimg = ImageTk.PhotoImage(self.BGimg)
+
+#        canBg = self.canvas.create_image(0, 0, image=self.BGimg, anchor='nw')
+
 
     def chooseOpt(self):
         MODES = [
@@ -58,11 +61,11 @@ class Play2frame(Frame):
           self.b[mode].place(relx=0.3, y=height, anchor="w")
 
 	self.parent.bind('<Return>', self.start_game)
-        self.button = Button(self.canvas, text="Start Game", font=("Arial", 16), fg='white', command=self.start_game, bg="grey", activebackground="green")
+        self.button = Button(self.canvas, text="Start Game", font=("Arial", 16), fg='white', command=lambda k='<Return>': self.start_game(k), bg="grey", activebackground="green")
         self.button.place(relx=0.5, y=height+70, anchor="c")
 
     def start_game(self, event):
-        global timer_init, playoption, playlist, mylist, myDic
+        global timer_init, playoption, playlist, mylist, keys
 	playoption = self.opt.get()
         if playoption == 'tr': playlist = myDic.Tr1
         if playoption == 'on': playlist = myDic.ON
@@ -70,39 +73,42 @@ class Play2frame(Frame):
         mylist=newlist(ii)
 	for opt in ['tr','on','kun']: self.b[opt].destroy()
 	self.button.destroy()
+#	canBg = self.canvas.create_image(0, 0, image=self.BGimg, anchor='nw')
 	self.initGame()
         timer_init = 1
 
     def initGame(self):
-	self.text1 = self.canvas.create_text(100, 120, font=("Purisa", 60, 'bold'), text=myDic.Kanji[self.kan0])
+        canBg = self.canvas.create_image(0, 0, image=self.BGimg, anchor='nw')
+
+	self.text1 = self.canvas.create_text(210, 80, font=("Purisa", 40, 'bold'), text=myDic.Kanji[self.kan0])
 	self.buttons = {}
 	self.textL = {}
 	for opt in range(5):
-	  height=50+30*opt
-	  self.buttons[opt] = Button(self.canvas, text = mylist[opt], font=("Purisa"), command = lambda k=opt: self.check(k), width=15, bg="white", activebackground="#DFECF2")
-	  self.buttons[opt].place(x=210, y=height)
-	  self.textL[opt] = self.canvas.create_text(385, height+20, text=str(opt+1), font=("Purisa"))
+	  height=200+35*opt
+	  self.buttons[opt] = Button(self.canvas, text = mylist[opt], font=("Purisa"), command = lambda k=opt: self.check(k), width=20, bg="white", activebackground="#DFECF2")
+	  self.buttons[opt].place(x=210, y=height, anchor='c')
+	  self.textL[opt] = self.canvas.create_text(95, height, text=str(opt+1), font=("Purisa"), anchor='c')
 	# autoplay image
 	self.img = Image.open(icon)
 	resized = self.img.resize((40, 40),Image.ANTIALIAS)
 	self.im = ImageTk.PhotoImage(resized)
 	# autoplay button
 	self.buttonS = Button(self.canvas, image=self.im, command=lambda k=ii: play(myDic.Sound[keys[k]]), relief=FLAT, bg='white', activebackground='white',highlightthickness=0,bd=0)
-	self.buttonS.place(x=80, y=165)
+	self.buttonS.place(x=210, y=130, anchor='c')
 	
 	# Hearts
 	self.heartL = {}
 	for it in range(3):
-	  self.heartL[it] = self.canvas.create_text(20+it*17,280, text=u"\u2665", font=('Purisa',16),fill='#DFECF2')
+	  self.heartL[it] = self.canvas.create_text(20+it*17,480, text=u"\u2665", font=('Purisa',16),fill='#DFECF2')
 
 	# Print score
-	self.printScore = self.canvas.create_text(70,280, text='Score: '+str(Score), font=('Purisa',14),fill='#778899',anchor=W)
+	self.printScore = self.canvas.create_text(70,480, text='Score: '+str(Score), font=('Purisa',14),fill='#778899',anchor=W)
 
 	# Autoplay checkbox
         self.auto = IntVar()
         self.auto.set(1)
-	self.ch = Checkbutton(self.canvas, text="Autoplay", variable=self.auto, bg='white', highlightthickness=0, bd=0, activebackground='white')
-	self.ch.place(x=310,y=275)
+	self.ch = Checkbutton(self.canvas, text="Autoplay", font=('Arial',13), variable=self.auto, bg='white', highlightthickness=0, bd=0, activebackground='white')
+	self.ch.place(x=310,y=472)
 
 	# Timer
 	self.canvas.create_oval(10,10,50,50,fill='#DFECF2',outline='white')
@@ -125,7 +131,10 @@ class Play2frame(Frame):
 		Score+=6
 		self.canvas.itemconfig(self.heartL[2], fill='#708090')
           self.buttons[num].configure(bg="green", activebackground="green")
-	  if self.auto.get(): play(myDic.Sound[keys[ii]]) 
+	  if self.auto.get(): 
+		try: play(myDic.Sound[keys[ii]]) 
+		except: print('No sound file...')
+
 	  self.after(1000, self.next_)
 	  self.canvas.itemconfig(self.printScore, text='Score: '+str(Score))
 	else:
@@ -154,16 +163,25 @@ class Play2frame(Frame):
     def run_timer(self):
 	global sec
 	if timer_init: sec+=0.1
-	self.canvas.itemconfig(self.timer_, extent=-sec*2)
-	if sec > 180: end_game(self)
+	self.canvas.itemconfig(self.timer_, extent=-sec*4)
+	if sec > 90: end_game(self)
 	self.after(100, self.run_timer)
 
-
 def main():
-    global root
+    global root, myDic, keys
     root = Tk()
-    frame = Play2frame(root)
-    root.geometry("420x300+300+300")
+    chooseSet = openSet(root, Set)
+    root.geometry("600x700+300+300")
+    root.mainloop()
+    myfile = chooseSet.myfile.get()
+    print myfile
+    infile = open(myfile, 'r')
+    tsvfile = csv.reader(infile, delimiter='\t')
+    myDic = Dic(tsvfile)
+    keys = myDic.shuffled()
+    root = Tk()
+    frame = Play2frame(root, myDic, keys)
+    root.geometry("420x500+300+300")
     def defkey(event):
        if event.keysym in ['1','2','3','4','5']:
          jj=int(event.keysym)-1
@@ -192,21 +210,22 @@ def newlist(ii):
     random.shuffle(mylist)
     return mylist
 
-def play(sound):
-    mixer.init()
-    mixer.music.load(path + sound)
-    mixer.music.play()
-    print sound
-
 def end_game(fr):
     global root, playoption, Date, TopScore, Mode, date_
     fr.destroy()
     new_canvas = Canvas(root, background='white')
     new_canvas.create_text(210,125,font=("Purisa", 16, 'bold'), text='Score: '+str(Score) )
+    buttonMore = Button(new_canvas, text = 'Play again!',
+                                font=("Purisa", 16,'bold'),
+                                command = start_over, width=10,
+                                fg='white', bg='#41a6db', relief=GROOVE)
+    buttonMore.place(x=210, y=400, anchor="c")
+
     TopScore.append(Score)
     TopScore.sort(reverse=True)
     Date[Score] = date_.strftime("%d/%m/%y")
     Mode[Score] = playoption
+
     for i in range(5):
 	try:
 	  score_ent = new_canvas.create_text(100,170+14*(i+1),font=("Purisa",12,'bold'),fill='dark blue', text=Date[TopScore[i]]+'\t'+str(TopScore[i])+'\t'+Mode[TopScore[i]], anchor=W )
@@ -214,15 +233,21 @@ def end_game(fr):
 	except IndexError: pass
     new_canvas.pack(fill=BOTH, expand=1)
     mainloop()
+
     with open(scorefile, 'w') as outfile:
  	for i in range(len(TopScore)):
           outfile.write(Date[TopScore[i]]+'\t'+str(TopScore[i])+'\t'+Mode[TopScore[i]]+'\n')
 
-    
-
-myDic = Dic(tsvfile)
-keys = myDic.shuffled()
-# print kanji[ii], mylist
+def start_over():
+   global root, ii, sec, Score, hearts, timer_init, date_
+   root.destroy()
+   ii=0
+   sec=0
+   Score=0
+   hearts=0
+   timer_init=1
+   date_=datetime.date.today()
+   main()
 
 # Read top scores:
 Date = {}
